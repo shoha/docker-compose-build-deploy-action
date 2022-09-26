@@ -10,6 +10,9 @@ inputs:
   docker-image:
     required: true
     description: Docker image identifier, including repo, name, and tag.
+  docker-network:
+    required: false
+    description: Name of a bridge network to create.
   docker-compose-file:
     required: false
     description: Path to the docker compose yml file to build and deploy.
@@ -58,9 +61,17 @@ runs:
         ssh_key: ${{ inputs.ssh-key }}
         use_context: true
 
+    - name: Create network if present.
+      shell: bash
+      if: inputs.docker-network
+      run: |
+        if [ -z $(docker network ls --filter name=^${{inputs.docker-network}}$ --format="{{ .Name }}") ]; then
+          docker network create "${{ inputs.docker-network }}";
+        fi
+
     - name: Deploy to remote host.
       shell: bash
       run: |
         docker-compose -f ${{ inputs.docker-compose-file}} pull
-        docker-compose -f ${{ inputs.docker-compose-file}} down --remove-orphans || true
+        docker-compose -f ${{ inputs.docker-compose-file}} down --remove-orphans
         docker-compose -f ${{ inputs.docker-compose-file}} up -d
