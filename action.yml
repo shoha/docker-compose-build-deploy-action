@@ -72,6 +72,6 @@ runs:
     - name: Deploy to remote host.
       shell: bash
       run: |
-        docker-compose -f ${{ inputs.docker-compose-file}} pull
-        docker-compose -f ${{ inputs.docker-compose-file}} down --remove-orphans
-        docker-compose -f ${{ inputs.docker-compose-file}} up -d
+        docker compose -f ${{ inputs.docker-compose-file}} pull
+        docker compose -f ${{ inputs.docker-compose-file}} down --remove-orphans
+        docker compose -f ${{ inputs.docker-compose-file}} up -d
